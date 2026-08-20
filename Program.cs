@@ -10,6 +10,12 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
 
+// Swagger UI purely as a way to browse and try every endpoint from the
+// browser instead of hand-typing curl commands — no bearing on OpenSearch
+// itself, just a convenience for exploring this project.
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
+
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("Postgres")));
 
@@ -42,6 +48,12 @@ builder.Services.AddSingleton<IOpenSearchClient>(new OpenSearchClient(connection
 builder.Services.AddScoped<ProductService>();
 
 var app = builder.Build();
+
+if (app.Environment.IsDevelopment())
+{
+    app.UseSwagger();
+    app.UseSwaggerUI();
+}
 
 app.MapControllers();
 
